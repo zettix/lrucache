@@ -4,7 +4,7 @@ At the moment, only std::string keys are supported, with a template data type.
 The following methods are currently supported.  Methods with a # move the key/value pair
 to the front of the queue, where the back of the queue is delete to make room for new
 insertions.
-
+```
   // Member functions
   LRUCache(long capacity)
   ~LRUCache()
@@ -28,5 +28,5 @@ insertions.
   void clear()
   // Debug
   std::string str()
-
+```
 See LRUCache_test.cpp for example usage.  
