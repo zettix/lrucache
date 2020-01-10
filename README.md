@@ -7,7 +7,7 @@ Apache License
 
 The following methods are currently supported.  Methods with a hash (#) move the key/value pair
 to the front of the queue, where the back of the queue is delete to make room for new
-insertions.
+insertions.  Method function should match that in std::unordered_map
 ```
   // Member functions
   LRUCache(long capacity)
