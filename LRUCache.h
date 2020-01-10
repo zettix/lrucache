@@ -10,22 +10,22 @@
 namespace com_zettix {
 
 // Utility: A double linked list node:
-template<class T>
+template<class S, class T>
 class DLLNode {
  public:
-  DLLNode<T>(std::string in_key, T in_data) : key(in_key), data(in_data) {
+  DLLNode<S, T>(S in_key, T in_data) : key(in_key), data(in_data) {
     child = nullptr;
     parent = nullptr;
   }
-  DLLNode<T> *parent;
-  DLLNode<T> *child;
+  DLLNode<S, T> *parent;
+  DLLNode<S, T> *child;
+  S key;
   T data;
-  std::string key;
   std::string str();
 };
 
-template<class T>
-std::string DLLNode<T>::str() {
+template<class S, class T>
+std::string DLLNode<S, T>::str() {
   std::stringstream ss;
   ss << "K:" << key << " V: ";
   ss << data;
@@ -41,18 +41,18 @@ at the back of the queue are removed as necessary to maintain
 the cache size.
 
 Usage: see public section, much like unordered_map with string keys.
-  LRUCache<T> me(100);  // LRUCache with capacity of 100 T's
+  LRUCache<S, T> me(100);  // LRUCache with capacity of 100 T's
   me.insert(std::make_pair("key", T value);
 */
-template<class T>
+template<class S, class T>
 class LRUCache {
 
  public:
-  class iterator : public std::iterator<std::bidirectional_iterator_tag, std::pair<std::string, T>>  {
+  class iterator : public std::iterator<std::bidirectional_iterator_tag, std::pair<S, T>>  {
    public:
-    iterator(DLLNode<T> *in_node): n(in_node) {}
+    iterator(DLLNode<S, T> *in_node): n(in_node) {}
     iterator(const iterator& mit) : n(mit.n) {}
-    std::pair<std::string, T>  operator*() {return std::make_pair(n->key, n->data);}
+    std::pair<S, T>  operator*() {return std::make_pair(n->key, n->data);}
 
     bool has_next() {
       if (n->child != nullptr) {
@@ -75,7 +75,7 @@ class LRUCache {
     }
 
    private:
-    DLLNode<T> *n;
+    DLLNode<S, T> *n;
   };
  
   // Member functions
@@ -90,13 +90,13 @@ class LRUCache {
   iterator begin() { return iterator(head); };
   iterator end() { return iterator(nullptr); };
   // Element Access
-  T operator[](const std::string &key);
-  T at(const std::string &key);
+  T operator[](const S &key);
+  T at(const S &key);
   // Element lookup
-  iterator find(std::string key) {
+  iterator find(S key) {
     auto search = data_.find(key);
     if (search != data_.end()) {
-      DLLNode<T> *n = search->second;
+      DLLNode<S, T> *n = search->second;
       update_node(n);
       iterator it(n);
       return it;
@@ -104,25 +104,25 @@ class LRUCache {
     iterator it(nullptr);
     return it;
   }
-  long count(const std::string &key);
+  long count(const S &key);
   // Modifiers
-  void insert(std::pair<std::string, T> item);
-  long erase(const std::string &key);
+  void insert(std::pair<S, T> item);
+  long erase(const S &key);
   void clear();
   // Debug
   std::string str();
 
  private:
-   std::unordered_map<std::string, DLLNode<T> *> data_;
-   DLLNode<T> *head = nullptr;
-   DLLNode<T> *tail = nullptr;
+   std::unordered_map<S, DLLNode<S, T> *> data_;
+   DLLNode<S, T> *head = nullptr;
+   DLLNode<S, T> *tail = nullptr;
    long cap = 10;
-   void update_node(DLLNode<T> *n);
-   void remove_node(DLLNode<T> *n);
+   void update_node(DLLNode<S, T> *n);
+   void remove_node(DLLNode<S, T> *n);
 };
 
-template<class T>
-void LRUCache<T>::set_capacity(long capacity) {
+template<class S, class T>
+void LRUCache<S, T>::set_capacity(long capacity) {
   cap = capacity;
   while (data_.size() > cap) {
     data_.erase(tail->key);
@@ -130,33 +130,33 @@ void LRUCache<T>::set_capacity(long capacity) {
   }
 }
 
-template<class T>
-LRUCache<T>::~LRUCache() {
+template<class S, class T>
+LRUCache<S, T>::~LRUCache() {
    for (auto it = data_.begin(); it !=data_.end(); it++) {
      delete (it->second);
    }
 }
 
-template<class T>
-long LRUCache<T>::size() {
+template<class S, class T>
+long LRUCache<S, T>::size() {
   return data_.size();
 }
 
-template<class T>
-long LRUCache<T>::max_size() {
+template<class S, class T>
+long LRUCache<S, T>::max_size() {
   return data_.max_size();
 }
 
-template<class T>
-void LRUCache<T>::clear() {
+template<class S, class T>
+void LRUCache<S, T>::clear() {
    for (auto it = data_.begin(); it !=data_.end(); it++) {
      delete it->second;
    }
   data_.clear();
 }
 
-template<class T>
-void LRUCache<T>::update_node(DLLNode<T> *n) {
+template<class S, class T>
+void LRUCache<S, T>::update_node(DLLNode<S, T> *n) {
   if (n->child != nullptr && n->parent != nullptr) { // middle a-x-b->x..a-b
      n->child->parent = n->parent;
      n->parent->child = n->child;
@@ -176,8 +176,8 @@ void LRUCache<T>::update_node(DLLNode<T> *n) {
   head = n;
 }
 
-template<class T>
-void LRUCache<T>::remove_node(DLLNode<T> *n) {
+template<class S, class T>
+void LRUCache<S, T>::remove_node(DLLNode<S, T> *n) {
   if (n->child != nullptr && n->parent != nullptr) { // middle a-x-b->x..a-b
      n->child->parent = n->parent;
      n->parent->child = n->child;
@@ -193,24 +193,24 @@ void LRUCache<T>::remove_node(DLLNode<T> *n) {
   delete(n);
 }
 
-template<class T>
-T LRUCache<T>::at(const std::string &key) {
+template<class S, class T>
+T LRUCache<S, T>::at(const S &key) {
   auto search = data_.find(key);
   if (search != data_.end()) {  // Head, Middle, or End, special cases?
-    DLLNode<T> *n = search->second;
+    DLLNode<S, T> *n = search->second;
     update_node(n);
     return head->data;
   }
   throw std::out_of_range("std::string not found.");
 }
 
-template<class T>
-T  LRUCache<T>::operator[](const std::string &key) {
+template<class S, class T>
+T  LRUCache<S, T>::operator[](const S &key) {
   return at(key);
 }
 
-template<class T>
-long LRUCache<T>::count(const std::string &key) {
+template<class S, class T>
+long LRUCache<S, T>::count(const S &key) {
   auto search = data_.find(key);
   if (search == data_.end()) {
     return 0;
@@ -218,15 +218,15 @@ long LRUCache<T>::count(const std::string &key) {
   return 1;
 }
 
-template<class T>
-void LRUCache<T>::insert(std::pair<std::string, T> item) {
+template<class S, class T>
+void LRUCache<S, T>::insert(std::pair<S, T> item) {
   auto search = data_.find(item.first);
   if (search != data_.end()) {
-    DLLNode<T> *n = search->second;
+    DLLNode<S, T> *n = search->second;
     update_node(n);
     n->data = item.second;
   } else {
-    DLLNode<T> *n = new DLLNode<T>(item.first, item.second);
+    DLLNode<S, T> *n = new DLLNode<S, T>(item.first, item.second);
     n->parent = nullptr;
     n->child = head;
     if (head != nullptr) {
@@ -244,11 +244,11 @@ void LRUCache<T>::insert(std::pair<std::string, T> item) {
   }
 }
 
-template<class T>
-long LRUCache<T>::erase(const std::string &key) {
+template<class S, class T>
+long LRUCache<S, T>::erase(const S &key) {
   auto search = data_.find(key);
   if (search != data_.end()) {
-    DLLNode<T> *node = search->second;
+    DLLNode<S, T> *node = search->second;
     data_.erase(key);
     remove_node(node);
     return 1;
@@ -256,10 +256,10 @@ long LRUCache<T>::erase(const std::string &key) {
   return 0;
 }
 
-template<class T>
-std::string LRUCache<T>::str() {
+template<class S, class T>
+std::string LRUCache<S, T>::str() {
   std::stringstream ss;
-  DLLNode<T> *n = head;
+  DLLNode<S, T> *n = head;
   while (n != nullptr) {
     ss << n->str() << std::endl;
     n = n->child;

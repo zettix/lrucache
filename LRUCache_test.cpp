@@ -14,8 +14,25 @@ bool my_assert(bool result, std::string msg) {
   return result;
 }
 
+bool intkey_test() {
+   com_zettix::LRUCache<int, double> cache(10L);
+   int keepkey = 10;
+   for (int i = 0; i < 10000; i++) {
+     cache.insert(std::make_pair(i, (double) i * 1.00001));
+     if (i > keepkey) {
+       auto foo = cache.find(keepkey);
+     }
+   }
+   bool result = my_assert(cache.size() == 10, "Int cache size");
+   result &= my_assert(cache.count(keepkey) == 1, "Find keep key");
+   result &= my_assert(cache.count(0) == 0, "Find 0 key");
+   int k = 10000 - 3;
+   result &= my_assert(cache.count(k) == 1, "Find 99.. key");
+   return result;
+}
+
 bool stress_test() {
-   com_zettix::LRUCache<int> cache(10L);
+   com_zettix::LRUCache<std::string, int> cache(10L);
    std::vector<std::string> names;
    for (char c = 'a'; c < 'z'; c++) {
      for (char c1 = 'a'; c1 < 'z'; c1++) {
@@ -39,21 +56,21 @@ bool stress_test() {
 }
     
 bool small_test() {
-   com_zettix::LRUCache<std::string> nextwords(2L);
+   com_zettix::LRUCache<std::string, std::string> nextwords(2L);
 	 nextwords.insert(std::make_pair("New York", "Mets"));
    nextwords.insert(std::make_pair("Philadelphia", "Phillies"));
    nextwords.insert(std::make_pair("Boston", "Red Sox"));
    nextwords.insert(std::make_pair("Oakland", "A's"));
-   nextwords.insert(std::make_pair("Pittsburg", "Steelers"));
+   nextwords.insert(std::make_pair("Pittsburgh", "Pirates"));
    bool result = my_assert(nextwords.size() == 2, "Correct size");
    result &= my_assert(nextwords.count("New York") == 0, "Find New York");
-   result &= my_assert(nextwords.count("Pittsburg") == 1, "Find New York");
-   result &= my_assert(nextwords["Pittsburg"].compare("Steelers") == 0, "Compare values");
+   result &= my_assert(nextwords.count("Pittsburgh") == 1, "Find Pittsburgh");
+   result &= my_assert(nextwords["Pittsburgh"].compare("Pirates") == 0, "Compare values");
    return result;
 }
 
 bool iterator_test() {
-   com_zettix::LRUCache<int> nextwords(5L);
+   com_zettix::LRUCache<std::string, int> nextwords(5L);
    nextwords.insert(std::make_pair("one", 1));
    nextwords.insert(std::make_pair("two", 2));
    nextwords.insert(std::make_pair("three", 3));
@@ -73,7 +90,7 @@ bool iterator_test() {
 }
 
 bool ref_test() {
-  com_zettix::LRUCache<int> cache(4L);
+  com_zettix::LRUCache<std::string, int> cache(4L);
   cache.insert(std::make_pair("keepme", 101));
  
   char k = 'a';
@@ -97,6 +114,7 @@ int main(int argc, char **argv) {
    result &= stress_test();
    result &= iterator_test();
    result &= ref_test();
+   result &= intkey_test();
    if (result) {
      std::cout << "Success!" << std::endl;
    } else {
