@@ -1,9 +1,19 @@
-# LRUCache
-## A Template C++ LRU (Least Recently Used) Cache.
+# LRUCache Map
+## A Template C++ LRU (Least Recently Used) Cache Map.
 
 (C) 2019 Sean Brennan
 
 Apache License
+
+Similar to unordered_map
+
+Usage:
+
+```
+  LRUCache<string, float> me(100);  // LRUCache with capacity of 100 T's
+  me.insert(std::make_pair("key",  0.123f);
+```
+
 
 The following methods are currently supported.  Methods with a hash (#) move the key/value pair
 to the front of the queue, where the back of the queue is delete to make room for new
